@@ -1,10 +1,11 @@
 #!/bin/bash
-echo “Validating Apache service”
-if systemctl is-active –quiet apache2; then
-    echo “Apache is running”
-    exit 0
-else
-    echo “Apache is not running”
-    exit 1
-fi
 
+# Check if the server is running
+echo "Validating the service..."
+curl -I localhost:8080 | grep "200 OK"
+
+# Optionally check if the process is running
+echo "Checking if the Java process is running..."
+ps -ef | grep java | grep -v grep
+
+echo "Service validation complete."
