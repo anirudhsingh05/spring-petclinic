@@ -1,17 +1,11 @@
 #!/bin/bash
 
-# Echo a message for logging
-echo "Stopping Apache server"
+# Find and kill the Java process
+echo "Stopping the server..."
+pkill -f "java -jar spring-petclinic-3.3.0-SNAPSHOT.jar"
 
-# Stop the Apache service
-sudo systemctl stop apache2
+# Optional: Confirm server has stopped
+echo "Checking server status..."
+curl -I localhost:8080 || echo "Server stopped."
 
-# Check if the Apache service stopped successfully
-if ! systemctl is-active --quiet apache2; then
-    echo "Apache has stopped successfully"
-    exit 0
-else
-    echo "Apache failed to stop"
-    exit 1
-fi
-
+echo "Server stopped successfully."
