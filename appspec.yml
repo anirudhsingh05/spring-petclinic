@@ -1,7 +1,7 @@
 version: 0.0
 os: linux
 files:
-  - source: /
+  - source: /target/spring-petclinic-3.3.0-SNAPSHOT.jar
     destination: /var/www/html/
  
 hooks:
