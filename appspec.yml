@@ -1,8 +1,8 @@
 version: 0.0
 os: linux
 files:
-  - source: /target/spring-petclinic-3.3.0-SNAPSHOT.jar
-    destination: /opt/
+  - source: /
+    destination: /home/ubuntu/
     overwrite: true
 
 hooks:
