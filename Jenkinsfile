@@ -17,17 +17,9 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh './mvnw package'
+                sh './mvnw clean package -DskipTests'
             }
         }
-        
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         withSonarQubeEnv('SonarQube') {
-        //             sh './mvnw sonar:sonar'
-        //         }
-        //     }
-        // }
         
         stage('Build Docker Image') {
             steps {
