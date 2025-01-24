@@ -1,10 +1,5 @@
 pipeline {
     agent any
-
-    tools {
-        maven 'Maven'
-        jdk 'JDK17'
-    }
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('Docker')
@@ -22,23 +17,7 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh './mvnw clean package -DskipTests'
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                }
-            }
-        }
-        
-        stage('Unit Tests') {
-            steps {
-                sh './mvnw test'
-            }
-            post {
-                always {
-                    junit '**/target/surefire-reports/*.xml'
-                }
+                sh './mvnw package'
             }
         }
         
