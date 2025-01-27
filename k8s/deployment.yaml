@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: petclinic
-          image: madblaze/spring-petclinic:v14
+          image: madblaze/spring-petclinic:v17
           ports:
             - containerPort: 8080
