@@ -1,3 +1,4 @@
+@Library('Petclinic') _
 pipeline {
     agent any
     
