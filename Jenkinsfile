@@ -59,7 +59,7 @@ pipeline {
                             git config user.name "anirudhsingh05"
                             
                             # Configure Git to use credentials
-                            git remote set-url origin "https://$GIT_USERNAME:$GIT_PASSWORD@github.com/anirudhsingh05/spring-petclinic.git"
+                            git remote set-url origin "https://github.com/anirudhsingh05/spring-petclinic.git"
                             
                             # Ensure we're on main branch
                             git checkout main || git checkout -b main
