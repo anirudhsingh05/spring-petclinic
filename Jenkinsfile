@@ -40,48 +40,48 @@ pipeline {
                 sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
-       stage('Update ArgoCD Manifest') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'git-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                    script {
-                        // Checkout your GitOps repository
-                        checkout([$class: 'GitSCM',
-                            branches: [[name: 'main']],
-                            userRemoteConfigs: [[
-                                url: 'https://github.com/anirudhsingh05/spring-petclinic.git',
-                                credentialsId: 'git-credentials'
-                            ]]
-                        ])
-                        
-                        // Set git configurations
-                        sh '''
-                            git config user.email "anirudhsingh05032001@gmail.com"
-                            git config user.name "anirudhsingh05"
-                            
-                            # Configure Git to use credentials
-                            git remote remove origin
-                            git remote add origin "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/anirudhsingh05/spring-petclinic.git"
-                            
-                            # Ensure we're on main branch
-                            git checkout main || git checkout -b main
-                        '''
-                        
-                        // Update the deployment file
-                        sh """
-                            sed -i 's|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:.*|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}|' k8s/deployment.yaml
-                        """
-                        
-                        // Commit and push changes
-                        sh '''
-                            git add k8s/deployment.yaml
-                            git commit -m "Update image tag"
-                            git push -f origin main
-                        '''
-                    }
-                }
+        stage('Update ArgoCD Manifest') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'git-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+            script {
+                // Checkout your GitOps repository
+                checkout([$class: 'GitSCM',
+                    branches: [[name: 'main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/anirudhsingh05/spring-petclinic.git',
+                        credentialsId: 'git-credentials'
+                    ]]
+                ])
+                
+                // Configure Git
+                sh '''
+                    git config user.email "anirudhsingh05032001@gmail.com"
+                    git config user.name "anirudhsingh05"
+                    
+                    # Configure Git credentials
+                    git config --local credential.helper '!f() { echo "username=${GIT_USERNAME}"; echo "password=${GIT_PASSWORD}"; }; f'
+                    
+                    # Ensure we're on main branch
+                    git checkout main || git checkout -b main
+                '''
+                
+                // Update deployment file
+                sh """
+                    sed -i 's|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:.*|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}|' k8s/deployment.yaml
+                """
+                
+                // Commit and push changes
+                sh '''
+                    git add k8s/deployment.yaml
+                    git commit -m "Update image tag"
+                    
+                    # Push using configured credentials
+                    git push -f https://github.com/anirudhsingh05/spring-petclinic.git main:main
+                '''
             }
         }
-
+    }
+}
 
     }
     
