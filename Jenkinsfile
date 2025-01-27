@@ -1,4 +1,4 @@
-@Library('Petclinic') _
+// @Library('Petclinic') _
 pipeline {
     agent any
     
