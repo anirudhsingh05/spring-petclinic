@@ -40,7 +40,7 @@ pipeline {
                 sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
-        stage('Update ArgoCD Manifest') {
+stage('Update ArgoCD Manifest') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'git-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
             script {
@@ -76,12 +76,13 @@ pipeline {
                     git commit -m "Update image tag"
                     
                     # Push using configured credentials
-                    git push -f https://github.com/anirudhsingh05/spring-petclinic.git main:main
+                    git push origin main
                 '''
             }
         }
     }
 }
+
 
     }
     
