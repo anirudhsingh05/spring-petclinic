@@ -59,7 +59,8 @@ pipeline {
                             git config user.name "anirudhsingh05"
                             
                             # Configure Git to use credentials
-                            git remote set-url origin "https://github.com/anirudhsingh05/spring-petclinic.git"
+                            git remote remove origin
+                            git remote add origin "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/anirudhsingh05/spring-petclinic.git"
                             
                             # Ensure we're on main branch
                             git checkout main || git checkout -b main
@@ -73,14 +74,13 @@ pipeline {
                         // Commit and push changes
                         sh '''
                             git add k8s/deployment.yaml
-                            git commit -m "Update image tag to ${BUILD_NUMBER}"
-                            git push origin main
+                            git commit -m "Update image tag"
+                            git push -f origin main
                         '''
                     }
                 }
             }
         }
-
 
 
     }
