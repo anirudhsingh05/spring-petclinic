@@ -40,7 +40,7 @@ pipeline {
                 sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
-        stage('Update ArgoCD Manifest') {
+       stage('Update ArgoCD Manifest') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'git-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                     script {
@@ -53,29 +53,34 @@ pipeline {
                             ]]
                         ])
                         
-                        // Update the image tag in the Kubernetes manifest
-                        sh """
+                        // Set git configurations
+                        sh '''
                             git config user.email "anirudhsingh05032001@gmail.com"
                             git config user.name "anirudhsingh05"
                             
                             # Configure Git to use credentials
-                            git remote set-url origin https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/anirudhsingh05/spring-petclinic.git
+                            git remote set-url origin "https://$GIT_USERNAME:$GIT_PASSWORD@github.com/anirudhsingh05/spring-petclinic.git"
                             
                             # Ensure we're on main branch
                             git checkout main || git checkout -b main
-                            
-                            # Update the deployment file
+                        '''
+                        
+                        // Update the deployment file
+                        sh """
                             sed -i 's|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:.*|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}|' k8s/deployment.yaml
-                            
-                            # Add, commit and push changes
-                            git add k8s/deployment.yaml
-                            git commit -m "Update image tag to ${IMAGE_TAG}"
-                            git push -u origin main
                         """
+                        
+                        // Commit and push changes
+                        sh '''
+                            git add k8s/deployment.yaml
+                            git commit -m "Update image tag to ${BUILD_NUMBER}"
+                            git push origin main
+                        '''
                     }
                 }
             }
         }
+
 
 
     }
