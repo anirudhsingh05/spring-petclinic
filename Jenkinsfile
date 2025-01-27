@@ -40,6 +40,30 @@ pipeline {
                 sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
+        stage('Update ArgoCD Manifest') {
+            steps {
+                script {
+                    // Checkout your GitOps repository
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: 'main']],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/anirudhsingh05/spring-petclinic.git',
+                            credentialsId: 'git-credentials'
+                        ]]
+                    ])
+                    
+                    // Update the image tag in the Kubernetes manifest
+                    sh """
+                        sed -i 's|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:.*|image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}|' k8s/deployment.yaml
+                        git config user.email "anirudhsingh05032001@gmail.com"
+                        git config user.name "anirudhsingh05"
+                        git add k8s/deployment.yaml
+                        git commit -m "Update image tag to ${IMAGE_TAG}"
+                        git push origin main
+                    """
+                }
+            }
+        }
     }
     
     post {
