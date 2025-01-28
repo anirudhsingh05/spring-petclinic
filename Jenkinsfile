@@ -40,7 +40,7 @@ pipeline {
                 sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
             }
         }
-        stage('Update ArgoCD Manifest') {
+        stage('Update Manifest') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'git-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                     script {
