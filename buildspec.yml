@@ -1,0 +1,71 @@
+version: 0.2
+
+env:
+  variables:
+    DOCKER_USERNAME: "madblaze"
+    GITOPS_REPO: "https://github.com/anirudhsingh05/petclinic_operations.git"
+    IMAGE_NAME: "madblaze/spring-petclinic"
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+  
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub...
+      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      
+  build:
+    commands:
+      - echo Build started on `date`
+      - ./mvnw clean package -DskipTests
+      - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $IMAGE_NAME:$IMAGE_TAG
+      - echo Updating GitOps repository...
+      # Extract the repo path from the full URL
+      - git clone https://${GITHUB_TOKEN}@github.com/petclinic_operations
+      - cd petclinic_operations
+      
+      # Configure git
+      - git config --global user.email "anirudhsingh05032001@gmail.com"
+      - git config --global user.name "anirudhsingh05"
+      
+      # Make changes and check if there are any differences
+      - sed -i "s|image: ${IMAGE_NAME}:[^ ]*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" k8s/deployment.yaml
+      - git add k8s/deployment.yaml
+      
+      # Only commit if there are changes
+      - |
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update image tag to ${IMAGE_TAG}"
+          git push origin main
+        fi
+
+      
+  # post_build:
+    # commands:
+    #   - echo Build completed on `date`
+    #   - echo Pushing the Docker image...
+    #   - docker push $IMAGE_NAME:$IMAGE_TAG
+    #   - echo Updating GitOps repository...
+    #   - git clone https://${GITHUB_TOKEN}@github.com/${GITOPS_REPO}.git
+    #   - cd ${GITOPS_REPO_NAME}
+    #   - sed -i "s|image: ${IMAGE_NAME}:[^ ]*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" k8s/deployment.yaml
+    #   - git config --global user.email "codebuild@example.com"
+    #   - git config --global user.name "AWS CodeBuild"
+    #   - git add k8s/deployment.yaml
+    #   - git commit -m "Update image tag to ${IMAGE_TAG}"
+    #   - git push origin main
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
