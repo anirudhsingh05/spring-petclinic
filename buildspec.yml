@@ -50,21 +50,6 @@ phases:
           git push origin main
         fi
 
-      
-  # post_build:
-    # commands:
-    #   - echo Build completed on `date`
-    #   - echo Pushing the Docker image...
-    #   - docker push $IMAGE_NAME:$IMAGE_TAG
-    #   - echo Updating GitOps repository...
-    #   - git clone https://${GITHUB_TOKEN}@github.com/${GITOPS_REPO}.git
-    #   - cd ${GITOPS_REPO_NAME}
-    #   - sed -i "s|image: ${IMAGE_NAME}:[^ ]*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" k8s/deployment.yaml
-    #   - git config --global user.email "codebuild@example.com"
-    #   - git config --global user.name "AWS CodeBuild"
-    #   - git add k8s/deployment.yaml
-    #   - git commit -m "Update image tag to ${IMAGE_TAG}"
-    #   - git push origin main
 
 cache:
   paths:
