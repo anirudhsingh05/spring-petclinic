@@ -5,6 +5,9 @@ env:
     DOCKER_USERNAME: "madblaze"
     GITOPS_REPO: "https://github.com/anirudhsingh05/petclinic_operations.git"
     IMAGE_NAME: "madblaze/spring-petclinic"
+  parameter-store:
+    DOCKER_PASSWORD: "/CodeBuild/DOCKER_PASSWORD"
+    GITHUB_TOKEN: "/CodeBuild/GITHUB_TOKEN"
 
 phases:
   install:
@@ -34,7 +37,7 @@ phases:
       - cd petclinic_operations
       - git config --global user.email "anirudhsingh05032001@gmail.com"
       - git config --global user.name "anirudhsingh05"
-      - sed -i "s|image: ${IMAGE_NAME}:[^ ]*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" k8s/deployment.yaml
+      - sed -i "s|image: madblaze/spring-petclinic:[^ ]*|image: madblaze/spring-petclinic:${IMAGE_TAG}|" k8s/deployment.yaml
       - git add k8s/deployment.yaml
       - |
         if git diff --staged --quiet; then
